@@ -17,6 +17,7 @@
     <properties>
         <java.version>1.8</java.version>
         <docker.image.prefix>${project.name}-${project.version}</docker.image.prefix>
+        <skipTests>true</skipTests>
     </properties>
 
     <dependencies>
@@ -48,17 +49,29 @@
             <!-- Docker maven plugin -->
             <plugin>
                 <groupId>com.spotify</groupId>
+                <artifactId>dockerfile-maven-plugin</artifactId>
+                <version>1.4.12</version>
+                <configuration>
+                    <repository>${docker.image.prefix}/${project.artifactId}</repository>
+                    <buildArgs>
+                        <JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>
+                    </buildArgs>
+                </configuration>
+            </plugin>
+
+            <!--<plugin>
+                <groupId>com.spotify</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
                 <version>1.0.0</version>
                 <configuration>
-                    <!-- docker私服的地址 -->
-                    <!--<dockerHost>http://192.168.99.100:2375</dockerHost>-->
-                    <!--依赖的基础镜像-->
-                    <!--<imageName>${docker.image.prefix}/${project.artifactId}</imageName>-->
+                    &lt;!&ndash; docker私服的地址 &ndash;&gt;
+                    &lt;!&ndash;<dockerHost>http://192.168.99.100:2375</dockerHost>&ndash;&gt;
+                    &lt;!&ndash;依赖的基础镜像&ndash;&gt;
+                    &lt;!&ndash;<imageName>${docker.image.prefix}/${project.artifactId}</imageName>&ndash;&gt;
                     <imageName>${project.build.finalName}</imageName>
-                    <!--Dockerfile的位置 -->
+                    &lt;!&ndash;Dockerfile的位置 &ndash;&gt;
                     <dockerDirectory>${project.basedir}/src/main/docker</dockerDirectory>
-                    <!-- 这里是复制 jar 包到 docker 容器指定目录配置 -->
+                    &lt;!&ndash; 这里是复制 jar 包到 docker 容器指定目录配置 &ndash;&gt;
                     <resources>
                         <resource>
                             <targetPath>/</targetPath>
@@ -67,7 +80,7 @@
                         </resource>
                     </resources>
                 </configuration>
-            </plugin>
+            </plugin>-->
 
 
         </plugins>

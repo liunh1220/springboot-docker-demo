@@ -16,6 +16,7 @@
 
     <properties>
         <java.version>1.8</java.version>
+        <skipTests>true</skipTests>
         <docker.image.prefix>${project.name}-${project.version}</docker.image.prefix>
     </properties>
 
@@ -51,14 +52,18 @@
                 <artifactId>docker-maven-plugin</artifactId>
                 <version>1.0.0</version>
                 <configuration>
+                    <forceTags>true</forceTags>
                     <!-- docker私服的地址 -->
                     <!--<dockerHost>http://192.168.99.100:2375</dockerHost>-->
                     <!--依赖的基础镜像-->
                     <!--<imageName>${docker.image.prefix}/${project.artifactId}</imageName>-->
-                    <imageName>${project.build.finalName}</imageName>
-                    <!--Dockerfile的位置 -->
-                    <dockerDirectory>${project.basedir}/src/main/docker</dockerDirectory>
-                    <!-- 这里是复制 jar 包到 docker 容器指定目录配置 -->
+                    <!--<imageName>${project.build.finalName}</imageName>-->
+                    <imageName>${project.groupId}/${project.artifactId}:${project.version}</imageName>
+                    <workdir>/</workdir>
+                    <baseImage>java</baseImage>
+                    <cmd>["java", "-version"]</cmd>
+                    <entryPoint>["java", "-jar", "./${project.build.finalName}.jar"]</entryPoint>
+                    <dockerDirectory>${project.basedir}/src/docker</dockerDirectory>
                     <resources>
                         <resource>
                             <targetPath>/</targetPath>
@@ -66,8 +71,68 @@
                             <include>${project.build.finalName}.jar</include>
                         </resource>
                     </resources>
+                    <imageTags>
+                        <imageTag>${project.version}</imageTag>
+                        <imageTag>latest</imageTag>
+                    </imageTags>
                 </configuration>
             </plugin>
+
+
+            <!-- 指定到相对路径下-->
+            <!--<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-artifact</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>${project.artifactId}</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>${project.packaging}</type>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>${basedir}/src/docker</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>-->
+
+
+
+            <!--<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-resource</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/src/docker</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/target</directory>
+                                    <includes>
+                                        <include>${project.build.finalName}.jar</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>-->
+
 
 
         </plugins>

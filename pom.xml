@@ -10,14 +10,14 @@
     </parent>
     <groupId>com.example</groupId>
     <artifactId>springboot-docker-demo</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>springboot-docker-demo</name>
     <description>Demo project for Spring Boot</description>
 
     <properties>
         <java.version>1.8</java.version>
         <skipTests>true</skipTests>
-        <docker.image.prefix>${project.name}-${project.version}</docker.image.prefix>
+        <docker.image.prefix>liunh</docker.image.prefix>
     </properties>
 
     <dependencies>
@@ -40,30 +40,77 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.properties</include>
+                    <include>**/*.xml</include>
+                </includes>
+                <filtering>false</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+
         <plugins>
+
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>com.example.demo.SpringbootDemoApplication</mainClass>
+                </configuration>
             </plugin>
 
             <!-- Docker maven plugin -->
             <plugin>
                 <groupId>com.spotify</groupId>
+                <artifactId>dockerfile-maven-plugin</artifactId>
+                <version>1.4.13</version>
+                <!--<executions>
+                    <execution>
+                        <id>default</id>
+                        <goals>
+                            <goal>build</goal>
+                            <goal>push</goal>
+                        </goals>
+                    </execution>
+                </executions>-->
+                <configuration>
+                    <dockerfile>Dockerfile</dockerfile>
+                    <!--<username>repoUserName</username>
+                    <password>repoPassword</password>
+                    <repository>${docker.image.prefix}/${project.artifactId}</repository>
+                     <tag>${project.version}</tag>
+                     -->
+                    <buildArgs>
+                        <JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>
+                    </buildArgs>
+                </configuration>
+            </plugin>
+
+            <!--<plugin>
+                <groupId>com.spotify</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
                 <version>1.0.0</version>
                 <configuration>
                     <forceTags>true</forceTags>
-                    <!-- docker私服的地址 -->
-                    <!--<dockerHost>http://192.168.99.100:2375</dockerHost>-->
-                    <!--依赖的基础镜像-->
-                    <!--<imageName>${docker.image.prefix}/${project.artifactId}</imageName>-->
-                    <!--<imageName>${project.build.finalName}</imageName>-->
-                    <imageName>${project.groupId}/${project.artifactId}:${project.version}</imageName>
+                    <dockerHost>http://192.168.132.129:2375</dockerHost>
+                    <imageName>${project.groupId}/${project.build.finalName}</imageName>
                     <workdir>/</workdir>
                     <baseImage>java</baseImage>
                     <cmd>["java", "-version"]</cmd>
                     <entryPoint>["java", "-jar", "./${project.build.finalName}.jar"]</entryPoint>
-                    <dockerDirectory>${project.basedir}/src/docker</dockerDirectory>
+                    <dockerDirectory>${project.basedir}/</dockerDirectory>
                     <resources>
                         <resource>
                             <targetPath>/</targetPath>
@@ -76,13 +123,13 @@
                         <imageTag>latest</imageTag>
                     </imageTags>
                 </configuration>
-            </plugin>
-
+            </plugin>-->
 
             <!-- 指定到相对路径下-->
-            <!--<plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.1.1</version>
                 <executions>
                     <execution>
                         <id>copy-artifact</id>
@@ -103,37 +150,7 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>-->
-
-
-
-            <!--<plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.1.0</version>
-                <executions>
-                    <execution>
-                        <id>copy-resource</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${basedir}/src/docker</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${basedir}/target</directory>
-                                    <includes>
-                                        <include>${project.build.finalName}.jar</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>-->
-
-
+            </plugin>
 
         </plugins>
     </build>
